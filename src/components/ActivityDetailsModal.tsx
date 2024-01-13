@@ -4,6 +4,7 @@ import {
     MutinyInvoice,
     TagItem
 } from "@mutinywallet/mutiny-wasm";
+import { Copy, Link, Shuffle, Zap } from "lucide-solid";
 import {
     createEffect,
     createMemo,
@@ -14,10 +15,6 @@ import {
     Switch
 } from "solid-js";
 
-import bolt from "~/assets/icons/bolt.svg";
-import chain from "~/assets/icons/chain.svg";
-import copyIcon from "~/assets/icons/copy.svg";
-import shuffle from "~/assets/icons/shuffle.svg";
 import {
     ActivityAmount,
     AmountFiat,
@@ -74,7 +71,7 @@ function LightningHeader(props: { info: MutinyInvoice }) {
                 {props.info.inbound
                     ? i18n.t("activity.transaction_details.lightning_receive")
                     : i18n.t("activity.transaction_details.lightning_send")}
-                <img src={bolt} alt="lightning bolt" class="h-4 w-4" />
+                <Zap class="h-4 w-4" />
             </div>
             <div class="flex flex-col items-center">
                 <div
@@ -130,10 +127,10 @@ function OnchainHeader(props: { info: OnChainTx; kind?: HackActivityType }) {
                             props.kind === "ChannelClose"
                         }
                     >
-                        <img src={shuffle} alt="swap" class="h-4 w-4" />
+                        <Shuffle class="h-4 w-4" />
                     </Match>
                     <Match when={true}>
-                        <img src={chain} alt="blockchain" class="h-4 w-4" />
+                        <Link class="h-4 w-4" />
                     </Match>
                 </Switch>
             </div>
@@ -172,7 +169,7 @@ export function MiniStringShower(props: { text: string }) {
                 classList={{ "bg-m-green rounded": copied() }}
                 onClick={() => copy(props.text)}
             >
-                <img src={copyIcon} alt="copy" class="h-4 w-4" />
+                <Copy class="h-4 w-4" />
             </button>
         </div>
     );
@@ -215,11 +212,13 @@ function LightningDetails(props: { info: MutinyInvoice; tags?: TagItem }) {
                         </TinyButton>
                     </KeyValue>
                 </Show>
-                <KeyValue key={i18n.t("activity.transaction_details.status")}>
-                    {props.info.paid
-                        ? i18n.t("activity.transaction_details.paid")
-                        : i18n.t("activity.transaction_details.unpaid")}
-                </KeyValue>
+                <Show when={!props.info.paid}>
+                    <KeyValue
+                        key={i18n.t("activity.transaction_details.status")}
+                    >
+                        i18n.t("activity.transaction_details.unpaid")
+                    </KeyValue>
+                </Show>
                 <KeyValue key={i18n.t("activity.transaction_details.date")}>
                     <FormatPrettyPrint ts={Number(props.info.last_updated)} />
                 </KeyValue>
@@ -233,12 +232,7 @@ function LightningDetails(props: { info: MutinyInvoice; tags?: TagItem }) {
                 <KeyValue key={i18n.t("activity.transaction_details.invoice")}>
                     <MiniStringShower text={props.info.bolt11 ?? ""} />
                 </KeyValue>
-                <KeyValue
-                    key={i18n.t("activity.transaction_details.payment_hash")}
-                >
-                    <MiniStringShower text={props.info.payment_hash ?? ""} />
-                </KeyValue>
-                <Show when={props.info.paid}>
+                <Show when={props.info.paid && !props.info.inbound}>
                     <KeyValue
                         key={i18n.t(
                             "activity.transaction_details.payment_preimage"
@@ -369,11 +363,6 @@ function OnchainDetails(props: {
                         "Pending"
                     )}
                 </KeyValue>
-                <Show when={props.kind === "ChannelOpen" && channelInfo()}>
-                    <KeyValue key={i18n.t("activity.transaction_details.peer")}>
-                        <MiniStringShower text={channelInfo()?.peer ?? ""} />
-                    </KeyValue>
-                </Show>
                 <KeyValue key={i18n.t("activity.transaction_details.txid")}>
                     <div class="flex gap-1">
                         {/* Have to do all these shenanigans because css / html is hard */}
@@ -412,7 +401,7 @@ function OnchainDetails(props: {
                             classList={{ "bg-m-green rounded": copied() }}
                             onClick={() => copy(props.info.txid)}
                         >
-                            <img src={copyIcon} alt="copy" class="h-4 w-4" />
+                            <Copy class="h-4 w-4" />
                         </button>
                     </div>
                 </KeyValue>

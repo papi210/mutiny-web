@@ -1,5 +1,3 @@
-/* @refresh reload */
-
 // Inspired by https://github.com/solidjs/solid-realworld/blob/main/src/store/index.js
 import {
     MutinyBalance,
@@ -40,6 +38,7 @@ type LoadStage =
     | "fresh"
     | "checking_double_init"
     | "downloading"
+    | "checking_for_existing_wallet"
     | "setup"
     | "done";
 
@@ -74,7 +73,10 @@ type MegaStore = [
         federations?: MutinyFederationIdentity[];
     },
     {
-        setup(password?: string): Promise<void>;
+        setup(
+            password?: string,
+            shouldCreateNewWallet?: boolean
+        ): Promise<void>;
         deleteMutinyWallet(): Promise<void>;
         setScanResult(scan_result: ParsedParams | undefined): void;
         sync(): Promise<void>;
@@ -158,7 +160,10 @@ export const Provider: ParentComponent = (props) => {
                 console.error(e);
             }
         },
-        async setup(password?: string): Promise<void> {
+        async setup(
+            password?: string,
+            shouldCreateNewWallet?: boolean
+        ): Promise<void> {
             try {
                 // If we're already in an error state there should be no reason to continue
                 if (state.setup_error) {
@@ -183,9 +188,17 @@ export const Provider: ParentComponent = (props) => {
                 await doubleInitDefense();
                 setState({ load_stage: "downloading" });
                 await initializeWasm();
-                setState({ load_stage: "setup" });
+
+                setState({ load_stage: "checking_for_existing_wallet" });
+                const existing = await MutinyWallet.has_node_manager();
+
+                if (!existing && !shouldCreateNewWallet) {
+                    navigate("/setup");
+                    return;
+                }
 
                 const settings = await getSettings();
+                setState({ load_stage: "setup" });
 
                 const mutinyWallet = await setupMutinyWallet(
                     settings,
@@ -200,24 +213,16 @@ export const Provider: ParentComponent = (props) => {
                 // If we get this far then we don't need the password anymore
                 setState({ needs_password: false });
 
-                // Check if we're subscribed and update the timestamp
-                try {
-                    const timestamp = await mutinyWallet?.check_subscribed();
-
-                    // Check that timestamp is a number
-                    if (timestamp && !isNaN(Number(timestamp))) {
-                        setState({ subscription_timestamp: Number(timestamp) });
-                    }
-                } catch (e) {
-                    console.error(e);
-                }
-
                 // Get balance
+                console.time("get_balance");
                 const balance = await mutinyWallet.get_balance();
+                console.timeEnd("get_balance");
 
                 // Get federations
+                console.time("list_federations");
                 const federations =
                     (await mutinyWallet.list_federations()) as MutinyFederationIdentity[];
+                console.timeEnd("list_federations");
 
                 setState({
                     mutiny_wallet: mutinyWallet,
@@ -235,6 +240,35 @@ export const Provider: ParentComponent = (props) => {
                     setState({ setup_error: eify(e), password: password });
                 }
             }
+        },
+        async postSetup(): Promise<void> {
+            console.time("post_setup");
+            if (!state.mutiny_wallet) {
+                console.error(
+                    "Unable to run post setup, no mutiny_wallet is set"
+                );
+                return;
+            }
+
+            // Sync our nostr profile info
+            try {
+                await state.mutiny_wallet.sync_nostr();
+            } catch (e) {
+                console.error("error syncing nostr profile", e);
+            }
+
+            // Check if we're subscribed and update the timestamp
+            try {
+                const timestamp = await state.mutiny_wallet.check_subscribed();
+
+                // Check that timestamp is a number
+                if (timestamp && !isNaN(Number(timestamp))) {
+                    setState({ subscription_timestamp: Number(timestamp) });
+                }
+            } catch (e) {
+                console.error("error checking subscription", e);
+            }
+            console.timeEnd("post_setup");
         },
         async deleteMutinyWallet(): Promise<void> {
             try {
@@ -486,6 +520,9 @@ export const Provider: ParentComponent = (props) => {
         } else {
             console.warn("setup aborted");
         }
+
+        // After we have the mutiny wallet we still need to check for subscription and sync nostr
+        await actions.postSetup();
 
         console.log("node manager setup done");
 

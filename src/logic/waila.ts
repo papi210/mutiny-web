@@ -28,7 +28,6 @@ export function toParsedParams(
     try {
         params = new PaymentParams(str || "");
     } catch (e) {
-        console.error(e);
         return { ok: false, error: new Error("Invalid payment request") };
     }
 

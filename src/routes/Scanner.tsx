@@ -3,7 +3,7 @@ import { Capacitor } from "@capacitor/core";
 import { useNavigate } from "@solidjs/router";
 import { createEffect, createSignal } from "solid-js";
 
-import { Button, Scanner as Reader, showToast } from "~/components";
+import { Button, Reader, showToast } from "~/components";
 import { useI18n } from "~/i18n/context";
 import { useMegaStore } from "~/state/megaStore";
 

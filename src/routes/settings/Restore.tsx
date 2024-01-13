@@ -10,9 +10,9 @@ import {
     validate
 } from "@modular-forms/solid";
 import { MutinyWallet } from "@mutinywallet/mutiny-wasm";
+import { LucideClipboard } from "lucide-solid";
 import { createSignal, For, Show, splitProps } from "solid-js";
 
-import pasteIcon from "~/assets/icons/paste.svg";
 import {
     BackLink,
     Button,
@@ -223,11 +223,7 @@ function TwelveWordsEntry() {
                         >
                             <div class="flex items-center gap-2">
                                 <span>{i18n.t("settings.restore.paste")}</span>
-                                <img
-                                    src={pasteIcon}
-                                    alt="paste"
-                                    class="h-4 w-4"
-                                />
+                                <LucideClipboard class="h-4 w-4" />
                             </div>
                         </button>
                     </div>

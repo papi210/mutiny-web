@@ -1,8 +1,8 @@
 import { Capacitor } from "@capacitor/core";
 import { A } from "@solidjs/router";
+import { ChevronRight } from "lucide-solid";
 import { For, Show } from "solid-js";
 
-import forward from "~/assets/icons/forward.svg";
 import {
     BackLink,
     DefaultMain,
@@ -16,6 +16,7 @@ import {
     VStack
 } from "~/components";
 import { useI18n } from "~/i18n/context";
+import { FeedbackLink } from "~/routes/Feedback";
 import { useMegaStore } from "~/state/megaStore";
 import { isFreeGiftingDay } from "~/utils";
 
@@ -50,7 +51,7 @@ function SettingsLinkList(props: {
                             >
                                 {link.text}
                             </span>
-                            <img src={forward} alt="go" />
+                            <ChevronRight />
                         </div>
                         <Show when={link.caption}>
                             <div class="text-sm text-m-grey-400">
@@ -183,6 +184,9 @@ export function Settings() {
                             }
                         ]}
                     />
+                    <div class="flex justify-center pb-8">
+                        <FeedbackLink />
+                    </div>
                     <div class="flex justify-center pb-8">
                         <TinyText>
                             {i18n.t("settings.version")} {RELEASE_VERSION}{" "}

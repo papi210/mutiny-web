@@ -1,7 +1,7 @@
 import { Toast, toaster } from "@kobalte/core";
+import { X } from "lucide-solid";
 import { Portal } from "solid-js/web";
 
-import close from "~/assets/icons/close.svg";
 import { SmallHeader } from "~/components";
 
 export function Toaster() {
@@ -59,8 +59,8 @@ function ToastItem(props: {
                         <p>{props.description}</p>
                     </Toast.Description>
                 </div>
-                <Toast.CloseButton class="flex-0 h-8 w-8 rounded-lg hover:bg-white/10 active:bg-m-blue">
-                    <img src={close} alt="Close" />
+                <Toast.CloseButton class="flex-0 flex h-8 w-8 items-center justify-center rounded-lg hover:bg-white/10 active:bg-m-blue">
+                    <X />
                 </Toast.CloseButton>
             </div>
         </Toast.Root>

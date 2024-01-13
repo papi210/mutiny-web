@@ -1,4 +1,6 @@
+import { Capacitor } from "@capacitor/core";
 import { createForm, required, SubmitHandler } from "@modular-forms/solid";
+import { SecureStoragePlugin } from "capacitor-secure-storage-plugin";
 import { createSignal, Match, Show, Switch } from "solid-js";
 
 import {
@@ -28,6 +30,8 @@ function SyncContactsForm() {
     const i18n = useI18n();
     const [state, actions] = useMegaStore();
     const [error, setError] = createSignal<Error>();
+
+    const allowNsec = Capacitor.isNativePlatform();
 
     const [feedbackForm, { Form, Field }] = createForm<NostrContactsForm>({
         initialValues: {
@@ -65,7 +69,7 @@ function SyncContactsForm() {
                             value={field.value}
                             error={field.error}
                             label={i18n.t("settings.nostr_contacts.npub_label")}
-                            placeholder="npub..."
+                            placeholder={allowNsec ? "npub/nsec..." : "npub..."}
                         />
                     )}
                 </Field>
@@ -95,15 +99,21 @@ export function SyncNostrContacts() {
     const [loading, setLoading] = createSignal(false);
     const [error, setError] = createSignal<Error>();
 
-    function clearNpub() {
+    async function clearNpub() {
         actions.saveNpub("");
+        if (Capacitor.isNativePlatform()) {
+            await SecureStoragePlugin.remove({ key: "nsec" });
+        }
     }
 
     async function resync() {
         setError(undefined);
         setLoading(true);
         try {
-            await state.mutiny_wallet?.sync_nostr_contacts(state.npub!);
+            await state.mutiny_wallet?.sync_nostr_contacts(
+                // We can only see the resync button if there's an npub set
+                state.npub!
+            );
         } catch (e) {
             console.error(e);
         }

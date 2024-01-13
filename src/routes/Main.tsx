@@ -1,109 +1,129 @@
-import { A } from "@solidjs/router";
-import { Show, Suspense } from "solid-js";
+import { createAsync, useNavigate } from "@solidjs/router";
+import { createMemo, createSignal, Show, Suspense } from "solid-js";
 
-import scan from "~/assets/icons/scan.svg";
-import settings from "~/assets/icons/settings.svg";
 import {
     BalanceBox,
-    Card,
-    CombinedActivity,
+    Circle,
     DecryptDialog,
     DefaultMain,
     HomePrompt,
-    IOSbanner,
+    HomeSubnav,
+    LabelCircle,
     LoadingIndicator,
-    LoadingShimmer,
-    Logo,
     NavBar,
     OnboardWarning,
-    PendingNwc,
+    OverlayScanner,
     ReloadPrompt,
     SafeArea,
-    VStack
+    SocialActionRow
 } from "~/components";
-import { useI18n } from "~/i18n/context";
-import { FeedbackLink } from "~/routes/Feedback";
+import { Fab } from "~/components/Fab";
 import { useMegaStore } from "~/state/megaStore";
-import { iosNotNative } from "~/utils/platform";
+
+export function WalletHeader(props: { loading: boolean }) {
+    const navigate = useNavigate();
+    const [state, _actions] = useMegaStore();
+    const npub = () => state.mutiny_wallet?.get_npub();
+
+    async function getProfile() {
+        const profile = state.mutiny_wallet?.get_nostr_profile();
+
+        return {
+            name: profile?.display_name || profile?.name || "Anon",
+            picture: profile?.picture || undefined,
+            // TODO: this but for real
+            lud16: profile?.lud16 || "elegant-giraffe@mutiny.plus"
+        };
+    }
+
+    const profile = createAsync(() => getProfile());
+
+    const profileImage = createMemo(() => {
+        if (props.loading) {
+            return undefined;
+        }
+
+        if (profile() && profile()!.picture) {
+            return profile()!.picture;
+        }
+
+        return `https://bitcoinfaces.xyz/api/get-image?name=${npub()}&onchain=false`;
+    });
+
+    return (
+        <header class="grid grid-cols-[auto_minmax(0,_1fr)_auto] items-center gap-4">
+            <LabelCircle
+                contact
+                label={false}
+                image_url={profileImage()}
+                onClick={() => navigate("/profile")}
+            />
+            <button
+                onClick={() => navigate("/profile")}
+                class="crt relative grid justify-center rounded-lg border-b border-t border-b-white/10 border-t-white/40 bg-black px-4 py-2"
+            >
+                <BalanceBox small loading={state.wallet_loading} />
+            </button>
+            <Circle onClick={() => navigate("/settings")}>
+                <img
+                    src="/mutiny-pixel-m.png"
+                    alt="mutiny"
+                    width={"32px"}
+                    height={"32px"}
+                    style={{
+                        "image-rendering": "pixelated"
+                    }}
+                />
+            </Circle>
+        </header>
+    );
+}
 
 export function Main() {
-    const i18n = useI18n();
     const [state, _actions] = useMegaStore();
 
-    const safari = iosNotNative();
+    const navigate = useNavigate();
+
+    const [scanner, setScanner] = createSignal(false);
 
     return (
         <SafeArea>
-            <DefaultMain>
-                <LoadingIndicator />
-                <header class="mb-2 flex w-full items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <Logo />
-                        <Show
-                            when={
-                                !state.wallet_loading &&
-                                state.mutiny_wallet?.get_network() !== "bitcoin"
-                            }
-                        >
-                            <div class="text-white-400 -my-1 box-border w-fit rounded bg-neutral-800 px-2 py-1 text-xs  uppercase">
-                                {state.mutiny_wallet?.get_network()}
-                            </div>
-                        </Show>
-                        <Show when={state.settings?.selfhosted === "true"}>
-                            <div class="text-white-400 -my-1 box-border w-fit rounded bg-neutral-800 px-2 py-1 text-xs  uppercase">
-                                {i18n.t("common.self_hosted")}
-                            </div>
-                        </Show>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <A
-                            class="rounded-lg p-2 hover:bg-white/5 active:bg-m-blue md:hidden"
-                            href="/scanner"
-                        >
-                            <img src={scan} alt="Scan" class="h-6 w-6" />
-                        </A>
-                        <A
-                            class="rounded-lg p-2 hover:bg-white/5 active:bg-m-blue md:hidden"
-                            href="/settings"
-                        >
-                            <img
-                                src={settings}
-                                alt="Settings"
-                                class="h-6 w-6"
-                            />
-                        </A>
-                    </div>
-                </header>
-                <Show when={!state.wallet_loading}>
-                    <Show when={safari && !state.testflightPromptDismissed}>
-                        <IOSbanner />
-                    </Show>
-                    <OnboardWarning />
-                    <ReloadPrompt />
+            <DefaultMain zeroBottomPadding={true}>
+                {/* <LoadingIndicator /> */}
+                <Show when={state.load_stage !== "done"}>
+                    <WalletHeader loading={true} />
+                    <div class="flex-1" />
+
+                    <LoadingIndicator />
+                    <div class="flex-1" />
                 </Show>
-                <BalanceBox loading={state.wallet_loading} />
-                <Suspense>
+                <Show when={state.load_stage === "done"}>
+                    <Suspense>
+                        <WalletHeader loading={false} />
+                    </Suspense>
+
                     <Show when={!state.wallet_loading && !state.safe_mode}>
-                        <PendingNwc />
+                        <SocialActionRow
+                            onScan={() => setScanner(true)}
+                            onSearch={() => navigate("/search")}
+                        />
                     </Show>
-                </Suspense>
-                <Card title={i18n.t("activity.title")}>
-                    <div class="p-1" />
-                    <VStack>
-                        <Suspense>
-                            <Show
-                                when={!state.wallet_loading}
-                                fallback={<LoadingShimmer />}
-                            >
-                                <CombinedActivity limit={3} />
-                            </Show>
-                        </Suspense>
-                    </VStack>
-                </Card>
-                <div class="flex-shrink-0 self-center pb-8 pt-4">
-                    <FeedbackLink />
-                </div>
+
+                    {/* <hr class="border-t border-m-grey-700" /> */}
+                    <ReloadPrompt />
+                    <OnboardWarning />
+                    <HomeSubnav />
+                </Show>
+
+                <Fab
+                    onSearch={() => navigate("/search")}
+                    onScan={() => setScanner(true)}
+                />
+                <Show when={scanner()}>
+                    <OverlayScanner onClose={() => setScanner(false)} />
+                </Show>
             </DefaultMain>
+
             <DecryptDialog />
             <HomePrompt />
             <NavBar activeTab="home" />

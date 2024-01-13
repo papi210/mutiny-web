@@ -62,7 +62,9 @@ function InboundWarning() {
             return undefined;
         }
 
-        const amount = BigInt(searchParams.amount);
+        const amountNumber = Number(searchParams.amount);
+
+        const amount = BigInt(amountNumber);
 
         const network = state.mutiny_wallet?.get_network() as Network;
 
@@ -107,6 +109,9 @@ export function Gift() {
         const amount = Number(searchParams.amount);
         const nwc = searchParams.nwc_uri;
         setLoading(true);
+        if (!nwc) {
+            throw new Error(i18n.t("settings.gift.something_went_wrong"));
+        }
         try {
             const claimResult = await state.mutiny_wallet?.claim_single_use_nwc(
                 BigInt(amount),

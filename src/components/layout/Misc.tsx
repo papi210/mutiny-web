@@ -6,6 +6,7 @@ import {
 } from "@kobalte/core";
 import { TagItem, TagKind } from "@mutinywallet/mutiny-wasm";
 import { A } from "@solidjs/router";
+import { Check, ChevronDown, X } from "lucide-solid";
 import {
     createResource,
     createSignal,
@@ -17,9 +18,6 @@ import {
     Switch
 } from "solid-js";
 
-import check from "~/assets/icons/check.svg";
-import close from "~/assets/icons/close.svg";
-import down from "~/assets/icons/down.svg";
 import {
     Button,
     DecryptDialog,
@@ -43,7 +41,7 @@ export const Card: ParentComponent<{
     titleElement?: JSX.Element;
 }> = (props) => {
     return (
-        <div class="flex w-full flex-col gap-2 rounded-xl bg-neutral-950/50 p-4">
+        <div class="flex w-full flex-col gap-2 rounded-xl bg-neutral-900 p-4">
             {props.title && <SmallHeader>{props.title}</SmallHeader>}
             {props.titleElement && props.titleElement}
             {props.children}
@@ -66,9 +64,14 @@ export const FancyCard: ParentComponent<{
     tag?: JSX.Element;
 }> = (props) => {
     return (
-        <div class="flex flex-col gap-2 rounded-xl border border-b-4 border-black/50 bg-m-grey-800 p-4 shadow-fancy-card">
-            {props.children}
-        </div>
+        <VStack smallgap>
+            <div class="mt-2 pl-4">
+                <SmallHeader>{props.title}</SmallHeader>
+            </div>
+            <div class="flex flex-col gap-2 rounded-xl border border-b-4 border-black/50 bg-m-grey-900 p-4 shadow-fancy-card">
+                {props.children}
+            </div>
+        </VStack>
     );
 };
 
@@ -80,7 +83,7 @@ export const SettingsCard: ParentComponent<{
             <div class="mt-2 pl-4">
                 <SmallHeader>{props.title}</SmallHeader>
             </div>
-            <div class="flex w-full flex-col gap-2 rounded-xl bg-m-grey-800 py-4">
+            <div class="flex w-full flex-col gap-2 rounded-xl bg-m-grey-900 py-4">
                 {props.children}
             </div>
         </VStack>
@@ -106,11 +109,7 @@ export const Collapser: ParentComponent<{
                     </Switch>
                     <span>{props.title}</span>
                 </div>
-                <img
-                    src={down}
-                    alt="expand / collapse"
-                    class="collapsible__trigger-icon"
-                />
+                <ChevronDown />
             </Collapsible.Trigger>
             <Collapsible.Content class="bg-m-grey-950 p-4 shadow-inner">
                 {props.children}
@@ -208,14 +207,14 @@ export const LargeHeader: ParentComponent<{
 }> = (props) => {
     return (
         <header
-            class="mb-2 mt-4 flex w-full items-center justify-between"
+            class="mb-2 mt-2 flex w-full items-center justify-between"
             classList={{
                 "justify-between": !props.centered,
                 "justify-center": props.centered
             }}
         >
             <h1
-                class="text-3xl font-semibold"
+                class="text-2xl font-semibold"
                 classList={{
                     "text-center": props.centered
                 }}
@@ -303,9 +302,9 @@ export function Checkbox(props: {
             onChange={props.onChange}
         >
             <KCheckbox.Input class="" />
-            <KCheckbox.Control class="flex-0 h-8 w-8 rounded-lg border-2 border-white bg-neutral-800 ui-checked:bg-m-red">
+            <KCheckbox.Control class="flex-0 flex h-8 w-8 items-center justify-center rounded-lg border-2 border-white bg-neutral-800 ui-checked:bg-m-red">
                 <KCheckbox.Indicator>
-                    <img src={check} class="h-8 w-8" alt="check" />
+                    <Check class="h-6 w-6" />
                 </KCheckbox.Indicator>
             </KCheckbox.Control>
             <KCheckbox.Label class="flex flex-1 flex-col gap-1 font-semibold">
@@ -320,8 +319,8 @@ export function Checkbox(props: {
 
 export function ModalCloseButton() {
     return (
-        <button class="self-center justify-self-center rounded-lg hover:bg-white/10 active:bg-m-blue">
-            <img src={close} alt="Close" class="h-8 w-8" />
+        <button class="flex h-8 w-8 items-center justify-center self-center justify-self-center rounded-lg hover:bg-white/10 active:bg-m-blue">
+            <X class="h-6 w-6" />
         </button>
     );
 }

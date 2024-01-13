@@ -1,8 +1,8 @@
 import { createForm, required, SubmitHandler } from "@modular-forms/solid";
 import { A, useLocation } from "@solidjs/router";
+import { MessageSquareText } from "lucide-solid";
 import { createSignal, Match, Show, Switch } from "solid-js";
 
-import feedback from "~/assets/icons/feedback.svg";
 import { ExternalLink, InfoBox, MegaCheck, NavBar } from "~/components";
 import {
     BackPop,
@@ -35,7 +35,7 @@ export function FeedbackLink(props: { setupError?: boolean }) {
             href="/feedback"
         >
             {i18n.t("feedback.link")}
-            <img src={feedback} class="h-5 w-5" alt="Feedback" />
+            <MessageSquareText class="h-5 w-5" />
         </A>
     );
 }

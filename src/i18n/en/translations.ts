@@ -53,6 +53,10 @@ export default {
         npub: "Nostr Npub",
         link_to_nostr_sync: "Import Nostr Contacts"
     },
+    request: {
+        request_bitcoin: "Request Bitcoin",
+        request: "Request"
+    },
     receive: {
         receive_bitcoin: "Receive Bitcoin",
         edit: "Edit",
@@ -565,6 +569,7 @@ export default {
         },
         gift: {
             give_sats_link: "Give sats as a gift",
+            something_went_wrong: "Something went wrong",
             title: "Gifting",
             no_plus_caption: "Upgrade to Mutiny+ to enable gifting",
             receive_too_small:
@@ -725,6 +730,7 @@ export default {
             loading: "Loading: {{stage}}",
             default: "Just getting started",
             double_checking: "Double checking something",
+            existing_wallet: "Checking for existing wallet",
             downloading: "Downloading",
             setup: "Setup",
             done: "Done"

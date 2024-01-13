@@ -4,26 +4,35 @@ import { JSXElement } from "solid-js";
 import { BackButton } from "~/components";
 import { useI18n } from "~/i18n/context";
 
-type StateWithPrevious = {
+export type StateWithPrevious = {
     previous?: string;
 };
 
-export function BackPop() {
+export function BackPop(props: { default?: string; title?: string }) {
     const i18n = useI18n();
     const navigate = useNavigate();
     const location = useLocation();
 
-    const state = location.state as StateWithPrevious;
+    function getBackPath() {
+        const state = location.state as StateWithPrevious;
 
-    // If there's no previous state want to just go back one level, basically ../
-    const newBackPath = location.pathname.split("/").slice(0, -1).join("/");
+        // If there's no previous state want to just go back one level, basically ../
+        const newBackPath = props.default
+            ? props.default
+            : location.pathname.split("/").slice(0, -1).join("/");
 
-    const backPath = () => (state?.previous ? state?.previous : newBackPath);
+        const backPath = state?.previous ? state?.previous : newBackPath;
+        return backPath;
+    }
+
+    const backPath = () => getBackPath();
 
     return (
         <BackButton
             title={
-                backPath() === "/"
+                props.title !== undefined
+                    ? props.title
+                    : backPath() === "/"
                     ? i18n.t("common.home")
                     : i18n.t("common.back")
             }
@@ -38,12 +47,17 @@ export function UnstyledBackPop(props: { children: JSXElement }) {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const state = location.state as StateWithPrevious;
+    function getBackPath() {
+        const state = location.state as StateWithPrevious;
 
-    // If there's no previous state want to just go back one level, basically ../
-    const newBackPath = location.pathname.split("/").slice(0, -1).join("/");
+        // If there's no previous state want to just go back one level, basically ../
+        const newBackPath = location.pathname.split("/").slice(0, -1).join("/");
 
-    const backPath = () => (state?.previous ? state?.previous : newBackPath);
+        const backPath = state?.previous ? state?.previous : newBackPath;
+        return backPath;
+    }
+
+    const backPath = () => getBackPath();
 
     return (
         <button

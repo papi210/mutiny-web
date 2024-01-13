@@ -1,5 +1,6 @@
 import { NwcProfile } from "@mutinywallet/mutiny-wasm";
 import { A, useSearchParams } from "@solidjs/router";
+import { Scan } from "lucide-solid";
 import {
     createResource,
     createSignal,
@@ -9,7 +10,6 @@ import {
 } from "solid-js";
 import { QRCodeSVG } from "solid-qr-code";
 
-import scan from "~/assets/icons/scan.svg";
 import {
     AmountSats,
     AmountSmall,
@@ -339,7 +339,7 @@ export function Connections() {
                             class="rounded-lg p-2 hover:bg-white/5 active:bg-m-blue md:hidden"
                             href="/scanner"
                         >
-                            <img src={scan} alt="Scan" class="h-6 w-6" />
+                            <Scan />
                         </A>{" "}
                     </div>
                     <LargeHeader>
