@@ -309,13 +309,13 @@ export function Chat() {
                     const a_time = isDirectMessage(a.content)
                         ? a.content.date
                         : isActivityItem(a.content)
-                        ? a.content.last_updated
-                        : 0;
+                          ? a.content.last_updated
+                          : 0;
                     const b_time = isDirectMessage(b.content)
                         ? b.content.date
                         : isActivityItem(b.content)
-                        ? b.content.last_updated
-                        : 0;
+                          ? b.content.last_updated
+                          : 0;
 
                     return b_time - a_time; // Descending order
                 });
@@ -436,7 +436,7 @@ export function Chat() {
         <MutinyWalletGuard>
             <main class="mx-auto grid h-[100dvh] w-full max-w-[600px] grid-cols-1 grid-rows-[minmax(10px,1fr)_4rem] flex-col overflow-y-hidden safe-top safe-bottom">
                 <div class="overflow-y-auto">
-                    <div class="fixed top-0 z-50 flex w-full flex-col gap-2 bg-m-grey-975/70 p-4 backdrop-blur-lg">
+                    <div class="fixed top-0 z-50 flex w-full max-w-[600px] flex-col gap-2 bg-m-grey-975/70 p-4 backdrop-blur-lg">
                         <div class="flex w-full flex-col gap-2">
                             <div class="flex items-center gap-2">
                                 <BackPop default="/" title="" />
