@@ -63,7 +63,7 @@ export function HomeSubnav() {
                     }}
                     onClick={() => setActiveView("everybody")}
                 >
-                    Everybody
+                    Friends
                 </button>
 
                 <button

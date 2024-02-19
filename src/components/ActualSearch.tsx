@@ -266,11 +266,6 @@ export function ActualSearch(props: { initialValue?: string }) {
                     </button>
                 </Show>
             </div>
-            {/* <Show when={!searchValue()}>
-                <Suspense fallback={<LoadingShimmer />}>
-                    <MeOrEverybody />
-                </Suspense>
-            </Show> */}
             <Show when={searchState() !== "notsendable"}>
                 <Button intent="green" onClick={handleContinue}>
                     Continue

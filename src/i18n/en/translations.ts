@@ -27,6 +27,17 @@ export default {
             "Mutiny is running in safe mode. Lightning is disabled.",
         self_hosted: "Self-hosted"
     },
+    home: {
+        receive: "Receive your first sats",
+        find: "Find your friends on nostr",
+        backup: "Secure your funds!",
+        connection: "Create a wallet connection"
+    },
+    profile: {
+        nostr_identity: "Nostr Identity",
+        add_lightning_address: "Add Lightning Address",
+        edit_profile: "Edit Profile"
+    },
     contacts: {
         new: "new",
         add_contact: "Add Contact",

@@ -810,7 +810,8 @@ export function Send() {
                             <div class="flex w-full">
                                 <SharpButton
                                     onClick={toggleVisibility}
-                                    disabled={!contact()?.npub}
+                                    // If there's no npub, or if there's an invoice, don't let switch to zap
+                                    disabled={!contact()?.npub || !!invoice()}
                                 >
                                     <div class="flex items-center gap-2">
                                         <Switch>

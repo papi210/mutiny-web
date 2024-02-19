@@ -4,9 +4,17 @@ import { createSignal, JSX, onCleanup, onMount, Show } from "solid-js";
 
 import { Circle } from "~/components";
 
-function FabMenuItem(props: { onClick: () => void; children: JSX.Element }) {
+function FabMenuItem(props: {
+    onClick: () => void;
+    disabled: boolean;
+    children: JSX.Element;
+}) {
     return (
-        <button class="flex gap-2 px-2 py-4" onClick={() => props.onClick}>
+        <button
+            class="flex gap-2 px-2 py-4 disabled:opacity-50"
+            disabled={props.disabled}
+            onClick={() => props.onClick()}
+        >
             {props.children}
         </button>
     );
@@ -61,8 +69,8 @@ export function Fab(props: { onSearch: () => void; onScan: () => void }) {
                         <li>
                             <FabMenuItem
                                 onClick={() => {
-                                    setOpen(false);
                                     props.onSearch();
+                                    setOpen(false);
                                 }}
                             >
                                 <ArrowUpRight />
@@ -105,6 +113,7 @@ export function MiniFab(props: {
     onSend: () => void;
     onRequest: () => void;
     onScan: () => void;
+    sendDisabled?: boolean | undefined;
 }) {
     const [open, setOpen] = createSignal(false);
     return (
@@ -114,9 +123,10 @@ export function MiniFab(props: {
                     <ul class="flex flex-col divide-y divide-m-grey-400/25">
                         <li>
                             <FabMenuItem
+                                disabled={props.sendDisabled || false}
                                 onClick={() => {
-                                    setOpen(false);
                                     props.onSend();
+                                    setOpen(false);
                                 }}
                             >
                                 <ArrowUpRight />
@@ -126,8 +136,8 @@ export function MiniFab(props: {
                         <li>
                             <FabMenuItem
                                 onClick={() => {
-                                    setOpen(false);
                                     props.onRequest();
+                                    setOpen(false);
                                 }}
                             >
                                 <ArrowDownLeft />
@@ -138,8 +148,8 @@ export function MiniFab(props: {
                         <li>
                             <FabMenuItem
                                 onClick={() => {
-                                    setOpen(false);
                                     props.onScan();
+                                    setOpen(false);
                                 }}
                             >
                                 <Scan />

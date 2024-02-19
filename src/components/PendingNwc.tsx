@@ -1,6 +1,6 @@
 import { TagItem } from "@mutinywallet/mutiny-wasm";
-import { A } from "@solidjs/router";
-import { Check, X } from "lucide-solid";
+import { A, useNavigate } from "@solidjs/router";
+import { Check, PlugZap, X } from "lucide-solid";
 import {
     createEffect,
     createResource,
@@ -11,7 +11,7 @@ import {
     Switch
 } from "solid-js";
 
-import { Card, InfoBox, NiceP } from "~/components";
+import { ButtonCard, Card, InfoBox, NiceP } from "~/components";
 import { useI18n } from "~/i18n/context";
 import { useMegaStore } from "~/state/megaStore";
 import {
@@ -35,6 +35,8 @@ export function PendingNwc() {
     const [state, _actions] = useMegaStore();
 
     const [error, setError] = createSignal<Error>();
+
+    const navigate = useNavigate();
 
     async function fetchPendingRequests() {
         const profiles = await state.mutiny_wallet?.get_nwc_profiles();
@@ -209,12 +211,12 @@ export function PendingNwc() {
                 </div>
             </Match>
             <Match when={true}>
-                <Card>
-                    <NiceP>
-                        No pending requests. Maybe you want to add a{" "}
-                        <A href="/settings/connections">Wallet Connection</A>?
-                    </NiceP>
-                </Card>
+                <ButtonCard onClick={() => navigate("/settings/connections")}>
+                    <div class="flex items-center gap-2">
+                        <PlugZap class="inline-block text-m-red" />
+                        <NiceP>{i18n.t("home.connection")}</NiceP>
+                    </div>
+                </ButtonCard>
             </Match>
         </Switch>
     );

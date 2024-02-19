@@ -1,5 +1,5 @@
 import { A } from "@solidjs/router";
-import { createMemo, Show } from "solid-js";
+import { createMemo, Match, Show, Switch } from "solid-js";
 import { QRCodeSVG } from "solid-qr-code";
 
 import {
@@ -14,10 +14,12 @@ import {
     NavBar,
     SafeArea
 } from "~/components";
+import { useI18n } from "~/i18n/context";
 import { useMegaStore } from "~/state/megaStore";
 
 export function Profile() {
     const [state, _actions] = useMegaStore();
+    const i18n = useI18n();
 
     const npub = () => state.mutiny_wallet?.get_npub();
 
@@ -27,8 +29,7 @@ export function Profile() {
         return {
             name: profile?.display_name || profile?.name || "Anon",
             picture: profile?.picture || undefined,
-            // TODO: this but for real
-            lud16: profile?.lud16 || "elegant-giraffe@mutiny.plus"
+            lud16: profile?.lud16 || undefined
         };
     });
 
@@ -56,36 +57,41 @@ export function Profile() {
                                 </Show>
                             </h1>
 
-                            <p class="break-all text-center font-system-mono text-base text-m-grey-350">
-                                {profile().lud16}
-                            </p>
+                            <Switch>
+                                <Match when={profile().lud16}>
+                                    <p class="break-all text-center font-system-mono text-base text-m-grey-350">
+                                        {profile().lud16}
+                                    </p>
+                                    <div class="w-[10rem] rounded bg-white p-[1rem]">
+                                        <QRCodeSVG
+                                            value={profile().lud16}
+                                            class="h-full max-h-[256px] w-full"
+                                        />
+                                    </div>
+                                </Match>
+                                <Match when={true}>
+                                    <A
+                                        href="#"
+                                        class="break-all text-center font-system-mono text-base text-m-grey-350"
+                                    >
+                                        {i18n.t(
+                                            "profile.add_lightning_address"
+                                        )}
+                                    </A>
+                                </Match>
+                            </Switch>
 
-                            <div class="w-[10rem] rounded bg-white p-[1rem]">
-                                <QRCodeSVG
-                                    value={profile().lud16}
-                                    class="h-full max-h-[256px] w-full"
-                                />
-                            </div>
                             <A
                                 href="#"
                                 class="text-xl font-semibold text-m-red no-underline active:text-m-red/80"
                             >
-                                Edit Profile
-                            </A>
-                        </Show>
-
-                        <Show when={!profile()}>
-                            <A
-                                href="#"
-                                class="text-xl font-semibold text-m-red no-underline active:text-m-red/80"
-                            >
-                                Create Profile
+                                {i18n.t("profile.edit_profile")}
                             </A>
                         </Show>
                     </div>
                     {/* <LargeHeader>Accounts</LargeHeader> */}
                     <BalanceBox loading={state.wallet_loading} />
-                    <FancyCard title="Nostr">
+                    <FancyCard title={i18n.t("profile.nostr_identity")}>
                         <KeyValue key="npub">
                             <MiniStringShower text={npub() || ""} />
                         </KeyValue>

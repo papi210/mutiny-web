@@ -1,7 +1,16 @@
 import { MutinyWallet } from "@mutinywallet/mutiny-wasm";
 import { useNavigate } from "@solidjs/router";
-import { createEffect, createResource, For, Match, Switch } from "solid-js";
+import { Search } from "lucide-solid";
+import {
+    createEffect,
+    createResource,
+    For,
+    Match,
+    Show,
+    Switch
+} from "solid-js";
 
+import { ButtonCard, NiceP } from "~/components/layout";
 import { useI18n } from "~/i18n/context";
 import { useMegaStore } from "~/state/megaStore";
 import { fetchZaps, getPrimalImageUrl } from "~/utils";
@@ -109,6 +118,14 @@ export function NostrActivity() {
 
     return (
         <div class="flex w-full flex-col divide-y divide-m-grey-800 overflow-x-clip">
+            <Show when={!data.latest || data.latest?.zaps.length === 0}>
+                <ButtonCard onClick={() => navigate("/search")}>
+                    <div class="flex items-center gap-2">
+                        <Search class="inline-block text-m-red" />
+                        <NiceP>{i18n.t("home.find")}</NiceP>
+                    </div>
+                </ButtonCard>
+            </Show>
             <For each={data.latest?.zaps}>
                 {(zap) => (
                     <>

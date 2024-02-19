@@ -27,7 +27,6 @@ export * from "./Logo";
 export * from "./Logs";
 export * from "./MoreInfoModal";
 export * from "./NavBar";
-export * from "./OnboardWarning";
 export * from "./PendingNwc";
 export * from "./Reader";
 export * from "./Reload";

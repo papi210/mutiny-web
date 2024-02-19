@@ -96,7 +96,7 @@ export function GenericItem(props: {
                     </Show>
                     {/* OPTIONAL MESSAGE */}
                     <Show when={props.message}>
-                        <div class="font-regular line-clamp-1 min-w-0 flex-shrink break-all rounded-full bg-m-grey-800 px-2 text-xs leading-6">
+                        <div class="font-regular line-clamp-1 min-w-0 break-all rounded-full bg-m-grey-800 px-2 py-1 text-xs leading-6">
                             {props.message}
                         </div>
                     </Show>

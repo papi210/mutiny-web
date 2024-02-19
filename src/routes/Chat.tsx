@@ -73,6 +73,7 @@ function SingleMessage(props: {
             }
 
             if (result.value?.invoice) {
+                console.log("about to get invoice");
                 try {
                     const alreadyPaid = await state.mutiny_wallet?.get_invoice(
                         result.value.invoice
@@ -267,13 +268,19 @@ export function Chat() {
     const [sending, setSending] = createSignal(false);
 
     const contact = createAsync(async () => {
-        return state.mutiny_wallet?.get_tag_item(params.id);
+        try {
+            return state.mutiny_wallet?.get_tag_item(params.id);
+        } catch (e) {
+            console.error("couldn't find contact");
+            console.error(e);
+            return undefined;
+        }
     });
 
     const [convo, { refetch }] = createResource(
         contact,
-        async (contact: TagItem, info) => {
-            // if (!contact() || !contact()?.npub) return undefined;
+        async (contact?: TagItem) => {
+            if (!contact || !contact?.npub) return undefined;
             if (!contact.npub) return [] as CombinedMessagesAndActivity[];
             try {
                 const activity = await state.mutiny_wallet?.get_label_activity(
@@ -281,8 +288,6 @@ export function Chat() {
                 );
 
                 console.log("activity", activity);
-                const refetchingTimestamp = info.refetching as bigint;
-                console.log("refetching since", refetchingTimestamp);
                 const convo = await state.mutiny_wallet?.get_dm_conversation(
                     contact.npub,
                     20n,
@@ -309,13 +314,13 @@ export function Chat() {
                     const a_time = isDirectMessage(a.content)
                         ? a.content.date
                         : isActivityItem(a.content)
-                          ? a.content.last_updated
-                          : 0;
+                        ? a.content.last_updated
+                        : 0;
                     const b_time = isDirectMessage(b.content)
                         ? b.content.date
                         : isActivityItem(b.content)
-                          ? b.content.last_updated
-                          : 0;
+                        ? b.content.last_updated
+                        : 0;
 
                     return b_time - a_time; // Descending order
                 });
@@ -453,14 +458,21 @@ export function Chat() {
                                     </ContactViewer>
                                 </Show>
                             </div>
-                            <div class="flex w-full justify-around gap-4 text-m-green">
+                            <div class="flex w-full justify-around gap-4">
                                 <button
-                                    class="flex gap-2 font-semibold"
+                                    disabled={
+                                        !contact() ||
+                                        !(
+                                            contact()?.ln_address ||
+                                            contact()?.lnurl
+                                        )
+                                    }
+                                    class="flex gap-2 font-semibold text-m-green disabled:text-m-grey-350 disabled:opacity-50"
                                     onClick={() => {
                                         sendToContact(contact());
                                     }}
                                 >
-                                    <ArrowUpRight class="inline-block text-m-green" />
+                                    <ArrowUpRight class="inline-block" />
                                     <span>Send</span>
                                 </button>
                                 <button
@@ -495,16 +507,18 @@ export function Chat() {
                                 </Suspense>
                             </Show>
                         </Suspense>
-                        {/* <div class="h-[2rem]" /> */}
                     </div>
                 </div>
                 <div class="grid grid-cols-[auto_1fr_auto] grid-rows-1 items-center gap-2 p-2">
-                    {/* TODO handle onscan */}
                     <MiniFab
-                        onScan={() => {}}
+                        onScan={() => navigate("/scanner")}
                         onSend={() => {
                             sendToContact(contact());
                         }}
+                        sendDisabled={
+                            !contact() ||
+                            !(contact()?.ln_address || contact()?.lnurl)
+                        }
                         onRequest={() => requestFromContact(contact())}
                     />
                     <SimpleInput

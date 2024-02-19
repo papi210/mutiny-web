@@ -11,7 +11,6 @@ import {
     LabelCircle,
     LoadingIndicator,
     NavBar,
-    OnboardWarning,
     OverlayScanner,
     ReloadPrompt,
     SafeArea,
@@ -32,7 +31,7 @@ export function WalletHeader(props: { loading: boolean }) {
             name: profile?.display_name || profile?.name || "Anon",
             picture: profile?.picture || undefined,
             // TODO: this but for real
-            lud16: profile?.lud16 || "elegant-giraffe@mutiny.plus"
+            lud16: profile?.lud16 || undefined
         };
     }
 
@@ -111,7 +110,6 @@ export function Main() {
 
                     {/* <hr class="border-t border-m-grey-700" /> */}
                     <ReloadPrompt />
-                    <OnboardWarning />
                     <HomeSubnav />
                 </Show>
 

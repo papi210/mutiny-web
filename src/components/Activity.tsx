@@ -1,14 +1,15 @@
 import { TagItem } from "@mutinywallet/mutiny-wasm";
-import { cache, createAsync, revalidate } from "@solidjs/router";
-import { Plus, Search, Shuffle } from "lucide-solid";
+import { cache, createAsync, revalidate, useNavigate } from "@solidjs/router";
+import { Plus, Save, Search, Shuffle } from "lucide-solid";
 import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js";
 
 import {
     ActivityDetailsModal,
-    Card,
+    ButtonCard,
     HackActivityType,
     NiceP
 } from "~/components";
+import { useI18n } from "~/i18n/context";
 import { useMegaStore } from "~/state/megaStore";
 import { timeAgo } from "~/utils";
 
@@ -145,10 +146,12 @@ export function UnifiedActivityItem(props: {
 
 export function CombinedActivity() {
     const [state, _actions] = useMegaStore();
+    const i18n = useI18n();
 
     const [detailsOpen, setDetailsOpen] = createSignal(false);
     const [detailsKind, setDetailsKind] = createSignal<HackActivityType>();
     const [detailsId, setDetailsId] = createSignal("");
+    const navigate = useNavigate();
 
     function openDetailsModal(id: string, kind: HackActivityType) {
         console.log("Opening details modal: ", id, kind);
@@ -195,36 +198,40 @@ export function CombinedActivity() {
             </Show>
             <Switch>
                 <Match when={activity().length === 0}>
-                    <Card>
-                        <NiceP>Welcome to the Mutiny.</NiceP>
-                    </Card>
-                    <Card>
-                        {/* <NiceP>TODO: copywriting lol</NiceP> */}
-                        <NiceP>
-                            <span>
-                                <Plus class="inline-block text-m-red" />
-                            </span>{" "}
-                            to receive your first sats.
-                        </NiceP>
-                        {/* <NiceP>
-                            {i18n.t(
-                                "activity.receive_some_sats_to_get_started"
-                            )}
-                        </NiceP> */}
-                    </Card>
-                    <Card>
-                        <NiceP>
-                            <span>
-                                <Search class="inline-block text-m-red" />
-                            </span>{" "}
-                            to find your friends on nostr.
-                        </NiceP>
-                    </Card>
-                    <Card>
-                        <NiceP>Don't forget to back up your seed words!</NiceP>
-                    </Card>
+                    <ButtonCard onClick={() => navigate("/receive")}>
+                        <div class="flex items-center gap-2">
+                            <Plus class="inline-block text-m-red" />
+                            <NiceP>{i18n.t("home.receive")}</NiceP>
+                        </div>
+                    </ButtonCard>
+                    <ButtonCard onClick={() => navigate("/search")}>
+                        <div class="flex items-center gap-2">
+                            <Search class="inline-block text-m-red" />
+                            <NiceP>{i18n.t("home.find")}</NiceP>
+                        </div>
+                    </ButtonCard>
+                    <Show when={!state.has_backed_up}>
+                        <ButtonCard
+                            onClick={() => navigate("/settings/backup")}
+                        >
+                            <div class="flex items-center gap-2">
+                                <Save class="inline-block text-m-red" />
+                                <NiceP>{i18n.t("home.backup")}</NiceP>
+                            </div>
+                        </ButtonCard>
+                    </Show>
                 </Match>
                 <Match when={activity().length >= 0}>
+                    <Show when={!state.has_backed_up}>
+                        <ButtonCard
+                            onClick={() => navigate("/settings/backup")}
+                        >
+                            <div class="flex items-center gap-2">
+                                <Save class="inline-block text-m-red" />
+                                <NiceP>{i18n.t("home.backup")}</NiceP>
+                            </div>
+                        </ButtonCard>
+                    </Show>
                     <div class="flex w-full flex-col divide-y divide-m-grey-800 overflow-x-clip">
                         <For each={activity()}>
                             {(activityItem) => (
