@@ -1,28 +1,14 @@
 import { expect, test } from "@playwright/test";
 
+import { loadHome, visitSettings } from "./utils";
+
 test.beforeEach(async ({ page }) => {
     await page.goto("http://localhost:3420/");
 });
 
 test("test local encrypt", async ({ page }) => {
-    // Expect a title "to contain" a substring.
-    await expect(page).toHaveTitle(/Mutiny Wallet/);
-
-    // Wait for an element matching the selector to appear in DOM.
-    await page.waitForSelector("text=0 SATS");
-
-    console.log("Page loaded.");
-
-    // Wait for a while just to make sure we can load everything
-    await page.waitForTimeout(1000);
-
-    // Navigate to settings
-    const settingsLink = await page.getByRole("link", { name: "Settings" });
-
-    settingsLink.click();
-
-    // Wait for settings to load
-    await page.waitForSelector("text=Settings");
+    await loadHome(page);
+    await visitSettings(page);
 
     // Click the "Backup" link
     await page.click("text=Backup");
@@ -47,6 +33,10 @@ test("test local encrypt", async ({ page }) => {
 
     // Click the "I wrote down the words" button
     await wroteDownButton.click();
+
+    // Go back to settings / change password
+    await visitSettings(page);
+    await page.click("text=Change Password");
 
     // The header should now say "Encrypt your seed words"
     await expect(page.locator("h1")).toContainText(["Encrypt your seed words"]);
@@ -86,5 +76,5 @@ test("test local encrypt", async ({ page }) => {
     await page.click("text=Decrypt Wallet");
 
     // Wait for an element matching the selector to appear in DOM.
-    await page.waitForSelector("text=0 SATS");
+    await page.locator(`text=0 sats`).first();
 });

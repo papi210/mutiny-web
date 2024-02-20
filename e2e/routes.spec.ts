@@ -1,5 +1,7 @@
 import { expect, Page, test } from "@playwright/test";
 
+import { loadHome, visitSettings } from "./utils";
+
 const routes = [
     "/",
     "/feedback",
@@ -57,29 +59,12 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("visit each route", async ({ page }) => {
-    // Start on the home page
-    await expect(page).toHaveTitle(/Mutiny Wallet/);
-    await page.waitForSelector("text=Welcome to the Mutiny!");
-
-    // Wait for a while just to make sure we can load everything
-    await page.waitForTimeout(1000);
-
-    console.log("Waiting for new wallet to be created...");
-
-    await page.locator(`button:has-text('New Wallet')`).click();
-
-    await page.locator("text=Create your profile").first();
-
-    await page.locator("button:has-text('Skip for now')").click();
+    await loadHome(page);
 
     checklist.set("/", true);
 
-    // Should have a balance up top now
-    await page.locator(`text=0 sats`).first();
+    await visitSettings(page);
 
-    // Find an image with an alt text of "mutiny" and click it
-    await page.locator("img[alt='mutiny']").first().click();
-    await expect(page.locator("h1").first()).toHaveText("Settings");
     checklist.set("/settings", true);
 
     // Mutiny+

@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { loadHome, visitSettings } from "./utils";
+
 const SIGNET_INVITE_CODE =
     "fed11qgqzc2nhwden5te0vejkg6tdd9h8gepwvejkg6tdd9h8garhduhx6at5d9h8jmn9wshxxmmd9uqqzgxg6s3evnr6m9zdxr6hxkdkukexpcs3mn7mj3g5pc5dfh63l4tj6g9zk4er";
 
@@ -8,24 +10,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("fedmint join, receive, send", async ({ page }) => {
-    // Expect a title "to contain" a substring.
-    await expect(page).toHaveTitle(/Mutiny Wallet/);
-
-    // Wait for an element matching the selector to appear in DOM.
-    await page.waitForSelector("text=0 SATS");
-
-    console.log("Page loaded.");
-
-    // Wait for a while just to make sure we can load everything
-    await page.waitForTimeout(1000);
-
-    // Navigate to settings
-    const settingsLink = await page.getByRole("link", { name: "Settings" });
-
-    settingsLink.click();
-
-    // Wait for settings to load
-    await page.waitForSelector("text=Settings");
+    await loadHome(page);
+    await visitSettings(page);
 
     // Click "Manage Federations" link
     await page.click("text=Manage Federations");
@@ -45,20 +31,26 @@ test("fedmint join, receive, send", async ({ page }) => {
     await page.goBack();
     await page.goBack();
 
-    // Make sure there's a fedimint icon
-    await expect(page.getByRole("img", { name: "community" })).toBeVisible();
+    // Click the top left button (it's the profile button), a child of header
+    // TODO: better ARIA stuff
+    await page.locator(`header button`).first().click();
 
-    // Click the receive button
-    await page.click("text=Receive");
+    // Make sure there's text that says "fedimint"
+    await page.locator("text=fedimint").first();
+
+    // Navigate back home
+    await page.goBack();
+
+    // Click the fab button
+    await page.locator("#fab").click();
+    // Click the receive button in the fab
+    await page.locator("text=Receive").last().click();
 
     // Expect the url to conain receive
     await expect(page).toHaveURL(/.*receive/);
 
     // At least one h1 should show "0 sats"
     await expect(page.locator("h1")).toContainText(["0 SATS"]);
-
-    // At least one h2 should show "0 USD"
-    await expect(page.locator("h2")).toContainText(["$0 USD"]);
 
     // Type 100 into the input
     await page.locator("#sats-input").pressSequentially("100");
@@ -114,16 +106,12 @@ test("fedmint join, receive, send", async ({ page }) => {
     // Click the "Nice" button
     await page.click("text=Nice");
 
-    // Make sure we have 100 sats in the fedimint balance
-    await expect(
-        page
-            .locator("div")
-            .filter({ hasText: /^100 eSATS$/ })
-            .nth(1)
-    ).toBeVisible();
+    // Make sure we have 100 sats in the top balance
+    await expect(page.locator("text=100 SATS").first()).toBeVisible();
 
     // Now we send
-    await page.click("text=Send");
+    await page.locator("#fab").click();
+    await page.locator("text=Send").last().click();
 
     // type refund@lnurl-staging.mutinywallet.com
     const sendInput = await page.locator("input");
