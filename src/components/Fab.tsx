@@ -3,6 +3,7 @@ import { ArrowDownLeft, ArrowUpRight, Plus, Scan } from "lucide-solid";
 import { createSignal, JSX, onCleanup, onMount, Show } from "solid-js";
 
 import { Circle } from "~/components";
+import { useI18n } from "~/i18n/context";
 
 function FabMenuItem(props: {
     onClick: () => void;
@@ -60,6 +61,7 @@ export function FabMenu(props: {
 export function Fab(props: { onSearch: () => void; onScan: () => void }) {
     const [open, setOpen] = createSignal(false);
     const navigate = useNavigate();
+    const i18n = useI18n();
 
     return (
         <>
@@ -74,13 +76,13 @@ export function Fab(props: { onSearch: () => void; onScan: () => void }) {
                                 }}
                             >
                                 <ArrowUpRight />
-                                Send
+                                {i18n.t("common.send")}
                             </FabMenuItem>
                         </li>
                         <li>
                             <FabMenuItem onClick={() => navigate("/receive")}>
                                 <ArrowDownLeft />
-                                Recieve
+                                {i18n.t("common.receive")}
                             </FabMenuItem>
                         </li>
 
@@ -92,14 +94,14 @@ export function Fab(props: { onSearch: () => void; onScan: () => void }) {
                                 }}
                             >
                                 <Scan />
-                                Scan
+                                {i18n.t("common.scan")}
                             </FabMenuItem>
                         </li>
                     </ul>
                 </FabMenu>
             </Show>
             <div class="fixed bottom-8 right-8 text-m-red">
-                <button onClick={() => setOpen(!open())}>
+                <button id="fab" onClick={() => setOpen(!open())}>
                     <Circle size="large">
                         <Plus class="h-8 w-8" />
                     </Circle>
@@ -116,6 +118,8 @@ export function MiniFab(props: {
     sendDisabled?: boolean | undefined;
 }) {
     const [open, setOpen] = createSignal(false);
+    const i18n = useI18n();
+
     return (
         <>
             <Show when={open()}>
@@ -130,7 +134,7 @@ export function MiniFab(props: {
                                 }}
                             >
                                 <ArrowUpRight />
-                                Send
+                                {i18n.t("common.send")}
                             </FabMenuItem>
                         </li>
                         <li>
@@ -141,7 +145,7 @@ export function MiniFab(props: {
                                 }}
                             >
                                 <ArrowDownLeft />
-                                Request
+                                {i18n.t("common.request")}
                             </FabMenuItem>
                         </li>
 
@@ -153,13 +157,13 @@ export function MiniFab(props: {
                                 }}
                             >
                                 <Scan />
-                                Scan
+                                {i18n.t("common.scan")}
                             </FabMenuItem>
                         </li>
                     </ul>
                 </FabMenu>
             </Show>
-            <button onClick={() => setOpen(true)}>
+            <button id="fab" onClick={() => setOpen(true)}>
                 <Plus class="h-8 w-8 text-m-red" />
             </button>
         </>
