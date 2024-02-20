@@ -54,6 +54,21 @@ function findByTag(tags: string[][], tag: string): string | undefined {
     }
 }
 
+function getZapKind(event: NostrEvent): "public" | "private" | "anonymous" {
+    const anonTag = event.tags.find((t) => {
+        if (t[0] === "anon") {
+            return true;
+        }
+    });
+
+    // If the anon field is empty it's anon, if it has other elements its private, otherwise it's public
+    if (anonTag) {
+        return anonTag.length < 2 ? "anonymous" : "private";
+    }
+
+    return "public";
+}
+
 async function simpleZapFromEvent(
     event: NostrEvent,
     wallet: MutinyWallet
@@ -66,8 +81,6 @@ async function simpleZapFromEvent(
         const from = request.pubkey;
 
         const content = request.content;
-        const anon = findByTag(request.tags, "anon");
-
         const bolt11 = findByTag(event.tags, "bolt11") || "";
 
         if (!bolt11) {
@@ -100,13 +113,7 @@ async function simpleZapFromEvent(
         }
 
         return {
-            // If the anon field is empty it's anon, if it has length it's private, otherwise it's public
-            kind:
-                typeof anon === "string"
-                    ? anon.length
-                        ? "private"
-                        : "anonymous"
-                    : "public",
+            kind: getZapKind(request),
             from_hexpub: from,
             to_hexpub: to,
             timestamp: BigInt(event.created_at),
@@ -280,7 +287,7 @@ export const fetchZaps: ResourceFetcher<
                         zaps.push(event);
                     }
                 } catch (e) {
-                    console.error("Failed to parse zap event: ", object);
+                    console.error("Failed to parse zap event: ", object, e);
                 }
             }
         }
