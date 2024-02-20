@@ -1,6 +1,6 @@
 import { TagItem } from "@mutinywallet/mutiny-wasm";
 import { createAsync, useNavigate, useParams } from "@solidjs/router";
-import { ArrowDownLeft, ArrowUpRight, Zap } from "lucide-solid";
+import { ArrowDownLeft, ArrowUpRight, MessagesSquare, Zap } from "lucide-solid";
 import {
     createEffect,
     createResource,
@@ -19,6 +19,7 @@ import {
     AmountSats,
     BackPop,
     Button,
+    ButtonCard,
     ContactButton,
     ContactFormValues,
     ContactViewer,
@@ -26,11 +27,13 @@ import {
     IActivityItem,
     LoadingShimmer,
     MutinyWalletGuard,
+    NiceP,
     showToast,
     SimpleInput,
     UnifiedActivityItem
 } from "~/components";
 import { MiniFab } from "~/components/Fab";
+import { useI18n } from "~/i18n/context";
 import { ParsedParams, toParsedParams } from "~/logic/waila";
 import { useMegaStore } from "~/state/megaStore";
 import { eify, hexpubFromNpub, timeAgo } from "~/utils";
@@ -267,6 +270,8 @@ export function Chat() {
     const [messageValue, setMessageValue] = createSignal("");
     const [sending, setSending] = createSignal(false);
 
+    const i18n = useI18n();
+
     const contact = createAsync(async () => {
         try {
             return state.mutiny_wallet?.get_tag_item(params.id);
@@ -283,20 +288,27 @@ export function Chat() {
             if (!contact || !contact?.npub) return undefined;
             if (!contact.npub) return [] as CombinedMessagesAndActivity[];
             try {
-                const activity = await state.mutiny_wallet?.get_label_activity(
-                    params.id
-                );
+                let acts = [] as IActivityItem[];
+                let dms = [] as FakeDirectMessage[];
 
-                console.log("activity", activity);
-                const convo = await state.mutiny_wallet?.get_dm_conversation(
-                    contact.npub,
-                    20n,
-                    undefined,
-                    undefined
-                );
+                try {
+                    acts = (await state.mutiny_wallet?.get_label_activity(
+                        params.id
+                    )) as IActivityItem[];
+                } catch (e) {
+                    console.error("error getting activity:", e);
+                }
 
-                const dms = convo as FakeDirectMessage[];
-                const acts = activity as IActivityItem[];
+                try {
+                    dms = (await state.mutiny_wallet?.get_dm_conversation(
+                        contact.npub,
+                        20n,
+                        undefined,
+                        undefined
+                    )) as FakeDirectMessage[];
+                } catch (e) {
+                    console.error("error getting dms:", e);
+                }
 
                 // Combine both arrays into an array of CombinedMessagesAndActivity, then sort by date
                 const combined = [
@@ -339,13 +351,14 @@ export function Chat() {
         const npub = contact()?.npub;
         if (!npub) return;
         setSending(true);
+        const rememberedValue = messageValue();
+        setMessageValue("");
         try {
             const dmResult = await state.mutiny_wallet?.send_dm(
                 npub,
-                messageValue()
+                rememberedValue
             );
             console.log("dmResult:", dmResult);
-            setMessageValue("");
             refetch();
         } catch (e) {
             console.error("error sending dm:", e);
@@ -495,15 +508,40 @@ export function Chat() {
                         <Suspense>
                             <Show when={contact()}>
                                 <Suspense fallback={<LoadingShimmer />}>
-                                    <Show when={convo.latest}>
-                                        {/* TODO: figure out how not to do typecasting here */}
-                                        <MessageList
-                                            convo={
-                                                convo.latest as CombinedMessagesAndActivity[]
+                                    <Switch>
+                                        <Match
+                                            when={
+                                                convo.latest &&
+                                                convo.latest.length > 0
                                             }
-                                            contact={contact()!}
-                                        />
-                                    </Show>
+                                        >
+                                            {/* TODO: figure out how not to do typecasting here */}
+                                            <MessageList
+                                                convo={
+                                                    convo.latest as CombinedMessagesAndActivity[]
+                                                }
+                                                contact={contact()!}
+                                            />
+                                        </Match>
+                                        <Match when={true}>
+                                            <ButtonCard
+                                                onClick={() =>
+                                                    requestFromContact(
+                                                        contact()
+                                                    )
+                                                }
+                                            >
+                                                <div class="flex items-center gap-4 text-left">
+                                                    <div class="flex-0">
+                                                        <MessagesSquare class="inline-block text-m-red" />
+                                                    </div>
+                                                    <NiceP>
+                                                        {i18n.t("chat.prompt")}
+                                                    </NiceP>
+                                                </div>
+                                            </ButtonCard>
+                                        </Match>
+                                    </Switch>
                                 </Suspense>
                             </Show>
                         </Suspense>
@@ -521,14 +559,23 @@ export function Chat() {
                         }
                         onRequest={() => requestFromContact(contact())}
                     />
-                    <SimpleInput
-                        disabled={sending()}
-                        value={messageValue()}
-                        onInput={(e) => setMessageValue(e.currentTarget.value)}
-                        placeholder="Message"
-                    />
+                    <form
+                        onSubmit={async (e) => {
+                            e.preventDefault();
+                            await sendMessage();
+                        }}
+                    >
+                        <SimpleInput
+                            disabled={sending()}
+                            value={messageValue()}
+                            onInput={(e) =>
+                                setMessageValue(e.currentTarget.value)
+                            }
+                            placeholder={i18n.t("chat.placeholder")}
+                        />
+                    </form>
                     <div>
-                        <Show when={messageValue()}>
+                        <Show when={messageValue() || sending()}>
                             <Button
                                 layout="xs"
                                 intent="blue"

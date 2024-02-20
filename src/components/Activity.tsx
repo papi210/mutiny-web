@@ -1,6 +1,6 @@
 import { TagItem } from "@mutinywallet/mutiny-wasm";
 import { cache, createAsync, revalidate, useNavigate } from "@solidjs/router";
-import { Plus, Save, Search, Shuffle } from "lucide-solid";
+import { Plus, Save, Search, Shuffle, Users } from "lucide-solid";
 import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js";
 
 import { ActivityDetailsModal, ButtonCard, NiceP } from "~/components";
@@ -30,6 +30,8 @@ export function UnifiedActivityItem(props: {
     item: IActivityItem;
     onClick: (id: string, kind: HackActivityType) => void;
 }) {
+    const navigate = useNavigate();
+
     const click = () => {
         props.onClick(
             props.item.id,
@@ -115,33 +117,37 @@ export function UnifiedActivityItem(props: {
     };
 
     return (
-        <>
-            <button class="pt-3 first-of-type:pt-0" onClick={() => click()}>
-                <GenericItem
-                    primaryAvatarUrl={primaryContact()?.image_url || ""}
-                    icon={shouldShowShuffle() ? <Shuffle /> : undefined}
-                    primaryName={
-                        props.item.inbound
-                            ? primaryContact()?.name || "Unknown"
-                            : "You"
-                    }
-                    genericAvatar={shouldShowGeneric()}
-                    verb={verb()}
-                    message={message()}
-                    secondaryName={secondaryName()}
-                    amount={
-                        props.item.amount_sats
-                            ? BigInt(props.item.amount_sats || 0)
-                            : undefined
-                    }
-                    date={timeAgo(props.item.last_updated)}
-                    accent={props.item.inbound ? "green" : undefined}
-                    visibility={
-                        props.item.kind === "Lightning" ? "private" : undefined
-                    }
-                />
-            </button>
-        </>
+        <div class="pt-3 first-of-type:pt-0">
+            <GenericItem
+                primaryAvatarUrl={primaryContact()?.image_url || ""}
+                icon={shouldShowShuffle() ? <Shuffle /> : undefined}
+                primaryOnClick={() =>
+                    primaryName() !== "You" && primaryContact()?.id
+                        ? navigate(`/chat/${primaryContact()?.id}`)
+                        : undefined
+                }
+                amountOnClick={click}
+                primaryName={
+                    props.item.inbound
+                        ? primaryContact()?.name || "Unknown"
+                        : "You"
+                }
+                genericAvatar={shouldShowGeneric()}
+                verb={verb()}
+                message={message()}
+                secondaryName={secondaryName()}
+                amount={
+                    props.item.amount_sats
+                        ? BigInt(props.item.amount_sats || 0)
+                        : undefined
+                }
+                date={timeAgo(props.item.last_updated)}
+                accent={props.item.inbound ? "green" : undefined}
+                visibility={
+                    props.item.kind === "Lightning" ? "private" : undefined
+                }
+            />
+        </div>
     );
 }
 
@@ -199,6 +205,16 @@ export function CombinedActivity() {
             </Show>
             <Switch>
                 <Match when={activity().length === 0}>
+                    <Show when={state.federations?.length === 0}>
+                        <ButtonCard
+                            onClick={() => navigate("/settings/federations")}
+                        >
+                            <div class="flex items-center gap-2">
+                                <Users class="inline-block text-m-red" />
+                                <NiceP>{i18n.t("home.federation")}</NiceP>
+                            </div>
+                        </ButtonCard>
+                    </Show>
                     <ButtonCard onClick={() => navigate("/receive")}>
                         <div class="flex items-center gap-2">
                             <Plus class="inline-block text-m-red" />

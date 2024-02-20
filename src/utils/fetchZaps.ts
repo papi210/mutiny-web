@@ -129,54 +129,6 @@ async function simpleZapFromEvent(
 // todo remove
 const PRIMAL_API = import.meta.env.VITE_PRIMAL;
 
-async function fetchFollows(
-    primal_url: string,
-    npub: string
-): Promise<string[]> {
-    let pubkey = undefined;
-    try {
-        pubkey = await hexpubFromNpub(npub);
-    } catch (err) {
-        console.error("Failed to get hexpub from npub");
-        throw err;
-    }
-
-    const response = await fetch(primal_url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify([
-            "contact_list",
-            { pubkey: pubkey, extended_response: false }
-        ])
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to load follows`);
-    }
-
-    const data = await response.json();
-
-    const follows: string[] = [];
-    const pubkeyRegex = new RegExp(/[0-9a-fA-F]{64}/);
-
-    for (const event of data) {
-        if (event.kind === 3) {
-            for (const tag of event.tags) {
-                if (tag[0] === "p") {
-                    // make sure it's actually a pubkey
-                    if (pubkeyRegex.test(tag[1])) {
-                        follows.push(tag[1]);
-                    }
-                }
-            }
-        }
-    }
-
-    return follows;
-}
-
 type PrimalResponse = NostrEvent | NostrProfile;
 
 async function fetchZapsFromPrimal(
@@ -245,7 +197,17 @@ export const fetchZaps: ResourceFetcher<
 
         // Only have to ask the relays for follows one time
         if (follows.length === 0) {
-            follows = await fetchFollows(primal_url, npub);
+            const contacts = await state.mutiny_wallet?.get_contacts_sorted();
+            const hexpubs = [];
+            for (const contact of contacts) {
+                if (contact.npub) {
+                    const hexpub = await hexpubFromNpub(contact.npub);
+                    if (hexpub) {
+                        hexpubs.push(hexpub);
+                    }
+                }
+            }
+            follows = hexpubs;
         }
 
         // Ask primal for all the zaps for these follow pubkeys

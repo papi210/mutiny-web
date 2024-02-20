@@ -33,12 +33,17 @@ export default {
         receive: "Receive your first sats",
         find: "Find your friends on nostr",
         backup: "Secure your funds!",
-        connection: "Create a wallet connection"
+        connection: "Create a wallet connection",
+        federation: "Join a federation"
     },
     profile: {
         nostr_identity: "Nostr Identity",
         add_lightning_address: "Add Lightning Address",
         edit_profile: "Edit Profile"
+    },
+    chat: {
+        prompt: "This is a new conversation. Try asking for money!",
+        placeholder: "Message"
     },
     contacts: {
         new: "new",

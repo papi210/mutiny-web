@@ -21,6 +21,7 @@ export function GenericItem(props: {
     forceSecondary?: boolean;
     link?: string;
     primaryOnClick?: () => void;
+    amountOnClick?: () => void;
     secondaryOnClick?: () => void;
     approveAction?: () => void;
     rejectAction?: () => void;
@@ -76,7 +77,10 @@ export function GenericItem(props: {
                 <div class="flex flex-wrap gap-1">
                     {/* AMOUNT */}
                     <Show when={props.amount}>
-                        <div
+                        <button
+                            onClick={() =>
+                                props.amountOnClick && props.amountOnClick()
+                            }
                             class="flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-white"
                             classList={{
                                 "bg-m-grey-800": !props.accent,
@@ -86,7 +90,7 @@ export function GenericItem(props: {
                             {/* <img src={bolt} width={8} height={8} /> */}
                             <Zap class="w-3" fill="currentColor" />
                             {`${props.amount!.toLocaleString()} sats`}
-                        </div>
+                        </button>
                     </Show>
                     {/* FIAT AMOUNT */}
                     <Show when={props.showFiat}>
