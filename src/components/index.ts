@@ -3,7 +3,6 @@ export * from "./successfail";
 
 export * from "./Activity";
 export * from "./ActivityDetailsModal";
-export * from "./ActivityItem";
 export * from "./Amount";
 export * from "./AmountEditable";
 export * from "./BalanceBox";
@@ -56,3 +55,4 @@ export * from "./OverlayScanner";
 export * from "./SocialActionRow";
 export * from "./ActualSearch";
 export * from "./ContactButton";
+export * from "./GenericItem";

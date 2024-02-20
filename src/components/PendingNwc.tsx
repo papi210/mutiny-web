@@ -1,5 +1,5 @@
 import { TagItem } from "@mutinywallet/mutiny-wasm";
-import { A, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { Check, PlugZap, X } from "lucide-solid";
 import {
     createEffect,
@@ -11,7 +11,7 @@ import {
     Switch
 } from "solid-js";
 
-import { ButtonCard, Card, InfoBox, NiceP } from "~/components";
+import { ButtonCard, GenericItem, InfoBox, NiceP } from "~/components";
 import { useI18n } from "~/i18n/context";
 import { useMegaStore } from "~/state/megaStore";
 import {
@@ -20,8 +20,6 @@ import {
     veryShortTimeStamp,
     vibrateSuccess
 } from "~/utils";
-
-import { GenericItem } from "./GenericItem";
 
 type PendingItem = {
     id: string;
@@ -82,7 +80,6 @@ export function PendingNwc() {
         { storage: createDeepSignal }
     );
 
-    // const [paying, setPaying] = createSignal<string>("");
     const [payList, setPayList] = createSignal<string[]>([]);
 
     async function payItem(item: PendingItem) {

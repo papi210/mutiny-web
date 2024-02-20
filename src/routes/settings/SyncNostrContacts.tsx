@@ -124,7 +124,7 @@ export function SyncNostrContacts() {
         <MutinyWalletGuard>
             <SafeArea>
                 <DefaultMain>
-                    <BackPop />
+                    <BackPop default="/settings" />
                     <LargeHeader>
                         {i18n.t("settings.nostr_contacts.title")}
                     </LargeHeader>

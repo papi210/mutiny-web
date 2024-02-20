@@ -8,7 +8,7 @@ export type StateWithPrevious = {
     previous?: string;
 };
 
-export function BackPop(props: { default?: string; title?: string }) {
+export function BackPop(props: { default: string; title?: string }) {
     const i18n = useI18n();
     const navigate = useNavigate();
     const location = useLocation();
@@ -42,7 +42,10 @@ export function BackPop(props: { default?: string; title?: string }) {
     );
 }
 
-export function UnstyledBackPop(props: { children: JSXElement }) {
+export function UnstyledBackPop(props: {
+    default: string;
+    children: JSXElement;
+}) {
     const i18n = useI18n();
     const navigate = useNavigate();
     const location = useLocation();
@@ -51,7 +54,9 @@ export function UnstyledBackPop(props: { children: JSXElement }) {
         const state = location.state as StateWithPrevious;
 
         // If there's no previous state want to just go back one level, basically ../
-        const newBackPath = location.pathname.split("/").slice(0, -1).join("/");
+        const newBackPath = props.default
+            ? props.default
+            : location.pathname.split("/").slice(0, -1).join("/");
 
         const backPath = state?.previous ? state?.previous : newBackPath;
         return backPath;

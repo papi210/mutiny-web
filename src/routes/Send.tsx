@@ -147,7 +147,7 @@ export function DestinationItem(props: {
                 <SmallHeader>{props.title}</SmallHeader>
                 <div class="text-sm text-neutral-500">{props.value}</div>
             </div>
-            <UnstyledBackPop>
+            <UnstyledBackPop default="/">
                 <div class="h-8 w-8 rounded-full bg-m-grey-800 px-1 py-1">
                     <X class="h-6 w-6" />
                 </div>
@@ -667,7 +667,7 @@ export function Send() {
     return (
         <MutinyWalletGuard>
             <DefaultMain>
-                <BackPop />
+                <BackPop default="/" />
                 <SuccessModal
                     confirmText={
                         sentDetails()?.amount

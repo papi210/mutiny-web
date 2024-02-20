@@ -176,7 +176,7 @@ export function Feedback() {
     return (
         <SafeArea>
             <DefaultMain>
-                <BackPop />
+                <BackPop default="/" />
 
                 <Switch>
                     <Match when={submitted()}>

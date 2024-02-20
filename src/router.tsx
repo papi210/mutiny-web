@@ -30,7 +30,6 @@ import {
     Receive,
     RequestRoute,
     Scanner,
-    Scratchpad,
     Search,
     Send,
     Setup,
@@ -161,7 +160,6 @@ export function Router() {
             <Route path="/newprofile" component={NewProfile} />
             <Route path="/importprofile" component={ImportProfile} />
             <Route path="/profile" component={Profile} />
-            <Route path="/scratchpad" component={Scratchpad} />
             <Route path="/chat/:id" component={Chat} />
             <Route path="/feedback" component={Feedback} />
             <Route path="/gift" component={GiftReceive} />

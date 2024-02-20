@@ -6,7 +6,7 @@ import { Circle } from "~/components";
 
 function FabMenuItem(props: {
     onClick: () => void;
-    disabled: boolean;
+    disabled?: boolean;
     children: JSX.Element;
 }) {
     return (
@@ -49,7 +49,7 @@ export function FabMenu(props: {
             class="fixed rounded-xl bg-neutral-700/30 px-2 backdrop-blur-lg"
             classList={{
                 "right-8 bottom-[calc(2rem+5rem)]": props.right,
-                "left-4 bottom-[calc(2rem+2rem)]": props.left
+                "bottom-[calc(2rem+2rem)]": props.left
             }}
         >
             {props.children}

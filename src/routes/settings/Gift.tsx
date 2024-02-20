@@ -208,7 +208,7 @@ export function Gift() {
         <MutinyWalletGuard>
             <SafeArea>
                 <DefaultMain>
-                    <BackPop />
+                    <BackPop default="/settings" />
                     <Show when={!canGift}>
                         <VStack>
                             <LargeHeader>

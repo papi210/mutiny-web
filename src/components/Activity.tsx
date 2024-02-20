@@ -3,17 +3,18 @@ import { cache, createAsync, revalidate, useNavigate } from "@solidjs/router";
 import { Plus, Save, Search, Shuffle } from "lucide-solid";
 import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js";
 
-import {
-    ActivityDetailsModal,
-    ButtonCard,
-    HackActivityType,
-    NiceP
-} from "~/components";
+import { ActivityDetailsModal, ButtonCard, NiceP } from "~/components";
 import { useI18n } from "~/i18n/context";
 import { useMegaStore } from "~/state/megaStore";
 import { timeAgo } from "~/utils";
 
 import { GenericItem } from "./GenericItem";
+
+export type HackActivityType =
+    | "Lightning"
+    | "OnChain"
+    | "ChannelOpen"
+    | "ChannelClose";
 
 export interface IActivityItem {
     kind: HackActivityType;

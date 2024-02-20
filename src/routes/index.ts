@@ -13,5 +13,4 @@ export * from "./Chat";
 export * from "./Setup";
 export * from "./NewProfile";
 export * from "./Request";
-export * from "./Scratchpad";
 export * from "./ImportProfile";
