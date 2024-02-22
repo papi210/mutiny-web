@@ -55,8 +55,8 @@ export function LabelCircle(props: {
         props.contact && props.name && props.name.length
             ? props.name[0]
             : props.label
-            ? "≡"
-            : "?";
+              ? "≡"
+              : "?";
     const bg = () => (props.name && props.contact ? gradient() : "");
 
     const [errored, setErrored] = createSignal(false);

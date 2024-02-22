@@ -2,7 +2,7 @@ import { createAsync, useNavigate } from "@solidjs/router";
 import { createMemo, createSignal, Show, Suspense } from "solid-js";
 
 import {
-    BalanceBox,
+    AmountSats,
     Circle,
     DecryptDialog,
     DefaultMain,
@@ -49,6 +49,11 @@ export function WalletHeader(props: { loading: boolean }) {
         return `https://bitcoinfaces.xyz/api/get-image?name=${npub()}&onchain=false`;
     });
 
+    const lightningPlusFedi = () =>
+        (state.balance?.federation || 0n) + (state.balance?.lightning || 0n);
+
+    const fullyReady = () => state.load_stage === "done" && state.price !== 0;
+
     return (
         <header class="grid grid-cols-[auto_minmax(0,_1fr)_auto] items-center gap-4">
             <LabelCircle
@@ -59,9 +64,26 @@ export function WalletHeader(props: { loading: boolean }) {
             />
             <button
                 onClick={() => navigate("/profile")}
-                class="crt relative grid justify-center rounded-lg border-b border-t border-b-white/10 border-t-white/40 bg-black px-4 py-2"
+                class="relative grid grid-cols-3 items-center justify-center rounded-lg border-b border-t border-b-white/10 border-t-white/40 bg-black px-4 py-2"
             >
-                <BalanceBox small loading={state.wallet_loading} />
+                <div class="w-2">
+                    <div
+                        title={fullyReady() ? "READY" : "ALMOST"}
+                        class="h-2 w-2 animate-throb rounded-full border-2"
+                        classList={{
+                            "border-m-green bg-m-green": fullyReady(),
+                            "border-m-yellow bg-m-yellow": !fullyReady()
+                        }}
+                    />
+                </div>
+                <h1 class="whitespace-nowrap text-2xl font-light">
+                    <AmountSats
+                        amountSats={lightningPlusFedi()}
+                        icon="lightning"
+                        denominationSize="lg"
+                    />
+                </h1>
+                <div class="w-2" />
             </button>
             <Circle onClick={() => navigate("/settings")}>
                 <img

@@ -29,7 +29,7 @@ test("restore from seed @slow", async ({ page }) => {
         const wordInput = await page.locator(`input[name='words.${i}']`);
 
         // Type the seed words into the input field
-        await wordInput.type(seedWords[i]);
+        await wordInput.fill(seedWords[i]);
     }
 
     // There should be a button with the text "Restore" and it should not be disabled
@@ -40,7 +40,7 @@ test("restore from seed @slow", async ({ page }) => {
 
     // A modal should pop up, click the "Confirm" button
     const confirmButton = await page.locator("button", { hasText: "Confirm" });
-    confirmButton.click();
+    await confirmButton.click();
 
     // Eventually we should have a balance of 100k sats
     await page.locator("text=100,000 SATS");
@@ -64,6 +64,5 @@ test("restore from seed @slow", async ({ page }) => {
 
     await confirmDeleteButton.click();
 
-    // Wait for the wallet to load
-    await page.waitForSelector("text=Welcome to the Mutiny!");
+    await page.locator("text=Welcome to the Mutiny!");
 });

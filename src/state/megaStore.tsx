@@ -73,10 +73,7 @@ type MegaStore = [
         federations?: MutinyFederationIdentity[];
     },
     {
-        setup(
-            password?: string,
-            shouldCreateNewWallet?: boolean
-        ): Promise<void>;
+        setup(password?: string): Promise<void>;
         deleteMutinyWallet(): Promise<void>;
         setScanResult(scan_result: ParsedParams | undefined): void;
         sync(): Promise<void>;
@@ -160,10 +157,7 @@ export const Provider: ParentComponent = (props) => {
                 console.error(e);
             }
         },
-        async setup(
-            password?: string,
-            shouldCreateNewWallet?: boolean
-        ): Promise<void> {
+        async setup(password?: string): Promise<void> {
             try {
                 // If we're already in an error state there should be no reason to continue
                 if (state.setup_error) {
@@ -188,14 +182,6 @@ export const Provider: ParentComponent = (props) => {
                 await doubleInitDefense();
                 setState({ load_stage: "downloading" });
                 await initializeWasm();
-
-                setState({ load_stage: "checking_for_existing_wallet" });
-                const existing = await MutinyWallet.has_node_manager();
-
-                if (!existing && !shouldCreateNewWallet) {
-                    navigate("/setup");
-                    return;
-                }
 
                 const settings = await getSettings();
                 setState({ load_stage: "setup" });
@@ -540,6 +526,7 @@ export const Provider: ParentComponent = (props) => {
         }, 3 * 1000); // Poll every 3 seconds
 
         // Run our first price check
+        console.log("running first price check");
         await actions.priceCheck();
 
         // Set up price checking every minute

@@ -65,6 +65,15 @@ module.exports = {
             },
             textShadow: {
                 button: "1px 1px 0px rgba(0, 0, 0, 0.4)"
+            },
+            animation: {
+                throb: "throb 5s ease-in-out infinite"
+            },
+            keyframes: {
+                throb: {
+                    "0%, 100%": { transform: "scale(1)", opacity: 0.9 },
+                    "50%": { transform: "scale(1.1)", opacity: 1 }
+                }
             }
         }
     },

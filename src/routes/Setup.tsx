@@ -24,8 +24,7 @@ export function Setup() {
                 "nostr"
             );
 
-            // Let setup know to create a new wallet this time through setup
-            await actions.setup(undefined, true);
+            await actions.setup(undefined);
 
             if (!profileSetupStage && !hasNip07) {
                 navigate("/newprofile");

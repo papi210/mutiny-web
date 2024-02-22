@@ -326,13 +326,13 @@ export function Chat() {
                     const a_time = isDirectMessage(a.content)
                         ? a.content.date
                         : isActivityItem(a.content)
-                        ? a.content.last_updated
-                        : 0;
+                          ? a.content.last_updated
+                          : 0;
                     const b_time = isDirectMessage(b.content)
                         ? b.content.date
                         : isActivityItem(b.content)
-                        ? b.content.last_updated
-                        : 0;
+                          ? b.content.last_updated
+                          : 0;
 
                     return b_time - a_time; // Descending order
                 });

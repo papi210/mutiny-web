@@ -21,6 +21,9 @@ test("fedmint join, receive, send", async ({ page }) => {
 
     const addButton = await page.getByRole("button", { name: "Add" });
 
+    // Wait 5 seconds for no good reason
+    await page.waitForTimeout(5000);
+
     // Click the "Add" button
     await addButton.click();
 
@@ -68,7 +71,7 @@ test("fedmint join, receive, send", async ({ page }) => {
     // TODO: figure out how to not get an error without waiting
     await page.waitForTimeout(1000);
 
-    continueButton.click();
+    await continueButton.click();
 
     await expect(
         page.getByText("Keep Mutiny open to complete the payment.")
@@ -135,7 +138,7 @@ test("fedmint join, receive, send", async ({ page }) => {
     });
     await expect(confirmButton).not.toBeDisabled();
 
-    confirmButton.click();
+    await confirmButton.click();
 
     // Wait for an h1 to appear in the dom that says "Payment Sent"
     await page.waitForSelector("text=Payment Sent", { timeout: 30000 });

@@ -17,7 +17,7 @@ import {
 } from "~/components";
 import { useI18n } from "~/i18n/context";
 import { useMegaStore } from "~/state/megaStore";
-import { eify, timeout } from "~/utils";
+import { eify } from "~/utils";
 
 type EncryptPasswordForm = {
     existingPassword: string;
@@ -62,7 +62,7 @@ export function Encrypt() {
                 f.password === "" ? undefined : f.password
             );
 
-            await timeout(1000);
+            // await timeout(1000);
             window.location.href = "/";
         } catch (e) {
             console.error(e);

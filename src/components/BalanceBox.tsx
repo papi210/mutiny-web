@@ -55,160 +55,117 @@ export function BalanceBox(props: { loading?: boolean; small?: boolean }) {
     const usableOnchain = () =>
         (state.balance?.confirmed || 0n) + (state.balance?.unconfirmed || 0n);
 
-    const lightningPlusFedi = () =>
-        (state.balance?.federation || 0n) + (state.balance?.lightning || 0n);
-
     return (
-        <Switch>
-            <Match when={props.small}>
-                <Show when={!props.loading} fallback={<LoadingShimmer small />}>
-                    <h1 class="whitespace-nowrap text-right text-2xl font-light">
-                        <AmountSats
-                            amountSats={lightningPlusFedi()}
-                            icon="lightning"
-                            denominationSize="lg"
-                        />
-                    </h1>
-                </Show>
-            </Match>
-            <Match when={true}>
-                <VStack>
-                    <FancyCard title="Lightning">
-                        {/* <button onClick={() => setMinimized(true)}>Minimize</button> */}
-                        <Show
-                            when={!props.loading}
-                            fallback={<LoadingShimmer />}
-                        >
-                            <Switch>
-                                <Match when={state.safe_mode}>
-                                    <div class="flex flex-col gap-1">
-                                        <InfoBox accent="red">
-                                            {i18n.t("common.error_safe_mode")}
-                                        </InfoBox>
-                                    </div>
-                                </Match>
-                                <Match when={true}>
-                                    <div class="flex flex-col gap-1">
-                                        <div class="text-2xl">
-                                            <AmountSats
-                                                amountSats={
-                                                    state.balance?.lightning ||
-                                                    0
-                                                }
-                                                icon="lightning"
-                                                denominationSize="lg"
-                                            />
-                                        </div>
-                                        <div class="text-lg text-white/70">
-                                            <AmountFiat
-                                                amountSats={
-                                                    state.balance?.lightning ||
-                                                    0
-                                                }
-                                                denominationSize="sm"
-                                            />
-                                        </div>
-                                    </div>
-                                </Match>
-                            </Switch>
-                        </Show>
-                    </FancyCard>
-                    <Show when={state.federations && state.federations.length}>
-                        <FancyCard title="Fedimint">
-                            <Show
-                                when={!props.loading}
-                                fallback={<LoadingShimmer />}
-                            >
-                                <div class="flex justify-between">
-                                    <div class="flex flex-col gap-1">
-                                        <div class="text-2xl">
-                                            <AmountSats
-                                                amountSats={
-                                                    state.balance?.federation ||
-                                                    0n
-                                                }
-                                                icon="community"
-                                                denominationSize="lg"
-                                                isFederation
-                                            />
-                                        </div>
-                                        <div class="text-lg text-white/70">
-                                            <AmountFiat
-                                                amountSats={
-                                                    state.balance?.federation ||
-                                                    0n
-                                                }
-                                                denominationSize="sm"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <Show
-                                        when={
-                                            state.balance?.federation || 0n > 0n
+        <VStack>
+            <FancyCard title="Lightning">
+                <Show when={!props.loading} fallback={<LoadingShimmer />}>
+                    <Switch>
+                        <Match when={state.safe_mode}>
+                            <div class="flex flex-col gap-1">
+                                <InfoBox accent="red">
+                                    {i18n.t("common.error_safe_mode")}
+                                </InfoBox>
+                            </div>
+                        </Match>
+                        <Match when={true}>
+                            <div class="flex flex-col gap-1">
+                                <div class="text-2xl">
+                                    <AmountSats
+                                        amountSats={
+                                            state.balance?.lightning || 0
                                         }
-                                    >
-                                        <div class="self-end justify-self-end">
-                                            <A
-                                                href="/swaplightning"
-                                                class={STYLE}
-                                            >
-                                                <Shuffle class="h-6 w-6" />
-                                            </A>
-                                        </div>
-                                    </Show>
+                                        icon="lightning"
+                                        denominationSize="lg"
+                                    />
                                 </div>
-                            </Show>
-                        </FancyCard>
-                    </Show>
-                    <FancyCard title="On-chain">
-                        {/* <hr class="my-2 border-m-grey-750" /> */}
-                        <Show
-                            when={!props.loading}
-                            fallback={<LoadingShimmer />}
-                        >
-                            <div class="flex justify-between">
-                                <div class="flex flex-col gap-1">
-                                    <div class="text-2xl">
-                                        <AmountSats
-                                            amountSats={totalOnchain()}
-                                            icon="chain"
-                                            denominationSize="lg"
-                                        />
-                                    </div>
-                                    <div class="text-lg text-white/70">
-                                        <AmountFiat
-                                            amountSats={totalOnchain()}
-                                            denominationSize="sm"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="flex flex-col items-end justify-between gap-1">
-                                    <Show
-                                        when={state.balance?.unconfirmed != 0n}
-                                    >
-                                        <Indicator>
-                                            {i18n.t("common.pending")}
-                                        </Indicator>
-                                    </Show>
-                                    <Show
-                                        when={state.balance?.unconfirmed === 0n}
-                                    >
-                                        <div />
-                                    </Show>
-                                    <Show when={usableOnchain() > 0n}>
-                                        <div class="self-end justify-self-end">
-                                            <A href="/swap" class={STYLE}>
-                                                <Shuffle class="h-6 w-6" />
-                                            </A>
-                                        </div>
-                                    </Show>
+                                <div class="text-lg text-white/70">
+                                    <AmountFiat
+                                        amountSats={
+                                            state.balance?.lightning || 0
+                                        }
+                                        denominationSize="sm"
+                                    />
                                 </div>
                             </div>
-                        </Show>
-                    </FancyCard>
-                </VStack>
-            </Match>
-        </Switch>
+                        </Match>
+                    </Switch>
+                </Show>
+            </FancyCard>
+            <Show when={state.federations && state.federations.length}>
+                <FancyCard title="Fedimint">
+                    <Show when={!props.loading} fallback={<LoadingShimmer />}>
+                        <div class="flex justify-between">
+                            <div class="flex flex-col gap-1">
+                                <div class="text-2xl">
+                                    <AmountSats
+                                        amountSats={
+                                            state.balance?.federation || 0n
+                                        }
+                                        icon="community"
+                                        denominationSize="lg"
+                                        isFederation
+                                    />
+                                </div>
+                                <div class="text-lg text-white/70">
+                                    <AmountFiat
+                                        amountSats={
+                                            state.balance?.federation || 0n
+                                        }
+                                        denominationSize="sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <Show when={state.balance?.federation || 0n > 0n}>
+                                <div class="self-end justify-self-end">
+                                    <A href="/swaplightning" class={STYLE}>
+                                        <Shuffle class="h-6 w-6" />
+                                    </A>
+                                </div>
+                            </Show>
+                        </div>
+                    </Show>
+                </FancyCard>
+            </Show>
+            <FancyCard title="On-chain">
+                {/* <hr class="my-2 border-m-grey-750" /> */}
+                <Show when={!props.loading} fallback={<LoadingShimmer />}>
+                    <div class="flex justify-between">
+                        <div class="flex flex-col gap-1">
+                            <div class="text-2xl">
+                                <AmountSats
+                                    amountSats={totalOnchain()}
+                                    icon="chain"
+                                    denominationSize="lg"
+                                />
+                            </div>
+                            <div class="text-lg text-white/70">
+                                <AmountFiat
+                                    amountSats={totalOnchain()}
+                                    denominationSize="sm"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end justify-between gap-1">
+                            <Show when={state.balance?.unconfirmed != 0n}>
+                                <Indicator>
+                                    {i18n.t("common.pending")}
+                                </Indicator>
+                            </Show>
+                            <Show when={state.balance?.unconfirmed === 0n}>
+                                <div />
+                            </Show>
+                            <Show when={usableOnchain() > 0n}>
+                                <div class="self-end justify-self-end">
+                                    <A href="/swap" class={STYLE}>
+                                        <Shuffle class="h-6 w-6" />
+                                    </A>
+                                </div>
+                            </Show>
+                        </div>
+                    </div>
+                </Show>
+            </FancyCard>
+        </VStack>
     );
 }

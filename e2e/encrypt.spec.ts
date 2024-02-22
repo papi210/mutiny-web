@@ -34,6 +34,9 @@ test("test local encrypt", async ({ page }) => {
     // Click the "I wrote down the words" button
     await wroteDownButton.click();
 
+    // Make sure the balance box ready light is on
+    await page.locator("title=READY");
+
     // Go back to settings / change password
     await visitSettings(page);
     await page.click("text=Change Password");
@@ -46,7 +49,7 @@ test("test local encrypt", async ({ page }) => {
     const passwordInput = await page.locator(`input[name='password']`);
 
     // 2. Type the password into the input field
-    await passwordInput.type("test");
+    await passwordInput.fill("test");
 
     // 3. Find the input field with the name "confirmPassword"
     const confirmPasswordInput = await page.locator(
@@ -54,14 +57,20 @@ test("test local encrypt", async ({ page }) => {
     );
 
     // 4. Type the password into the input field
-    await confirmPasswordInput.type("test");
+    await confirmPasswordInput.fill("test");
 
     // The "Encrypt" button should not be disabled
     const encryptButton = await page.locator("button", { hasText: "Encrypt" });
     await expect(encryptButton).not.toBeDisabled();
 
+    // wait 5 seconds for no reason (SADLY THIS IS IMPORTANT FOR THE TEST TO PASS)
+    await page.waitForTimeout(5000);
+
     // Click the "Encrypt" button
     await encryptButton.click();
+
+    // wait for a while just to see what happens
+    // await page.waitForTimeout(10000);
 
     // Wait for a modal with the text "Enter your password"
     await page.waitForSelector("text=Enter your password");
@@ -70,7 +79,7 @@ test("test local encrypt", async ({ page }) => {
     const passwordInput2 = await page.locator(`input[name='password']`);
 
     // Type the password into the input field
-    await passwordInput2.type("test");
+    await passwordInput2.fill("test");
 
     // Click the "Decrypt Wallet" button
     await page.click("text=Decrypt Wallet");
