@@ -43,6 +43,7 @@
         "workbox-window": "^7.0.0"
     },
     "dependencies": {
+        "i18next-http-backend": "^2.5.0",
         "@capacitor-mlkit/barcode-scanning": "^5.3.0",
         "@capacitor/android": "^5.5.1",
         "@capacitor/app": "^5.0.6",
